@@ -1,7 +1,6 @@
 # com.aghstrategies.movesmanagement
 
 ## Custom form for recording Moves Management activities
-
 Create a form that is accessible for 'Development Officers' User Group that has the following fields:
 
 + Activity Type - Select (what ever options they want us to offer).
@@ -49,6 +48,8 @@ On Submission of this form Activities (may be creating up to 4 activities depend
 + Other type of Ask Made - Custom text field that needs to be created.
 + Ask Amount - Custom Money field that needs to be created
 
+For more information see the [test file for this feature](tests/movesManagementForm.feature)
+
 ## Tracking the date/time and status change of activities
 
 We will create a custom table in the database called `civicrm_activity_status_change` with columns for:
@@ -60,8 +61,10 @@ We will create a custom table in the database called `civicrm_activity_status_ch
 
 Whenever the Activity status is changed for any activity we will record an entry to that table. When an activity is created we will record a row in that table. We will display a mini table on each activity that shows all the activity status change data for that activity. In edit mode of an activity Admin users will be able to add and delete rows from the table.
 
-
 NOTE: This is only necessary if they need to track each time an Activity Status is changed if they only care about the last time an activity status is changed we do not need to create a whole table. We can create a custom field and write custom code to update it whenever the status is changed which would be simpler but less robust.
+
+For more information see the [test file for this feature](tests/activityStatusChangeTracker.feature)
+
 
 ## Custom report for tracking Activity Status Changes
 
