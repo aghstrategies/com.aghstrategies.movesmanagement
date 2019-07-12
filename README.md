@@ -60,6 +60,9 @@ We will create a custom table in the database called `civicrm_activity_status_ch
 
 Whenever the Activity status is changed for any activity we will record an entry to that table. When an activity is created we will record a row in that table. We will display a mini table on each activity that shows all the activity status change data for that activity. In edit mode of an activity Admin users will be able to add and delete rows from the table.
 
+
+NOTE: This is only necessary if they need to track each time an Activity Status is changed if they only care about the last time an activity status is changed we do not need to create a whole table. We can create a custom field and write custom code to update it whenever the status is changed which would be simpler but less robust.
+
 ## Custom report for tracking Activity Status Changes
 
 We will create a new custom report template that:
@@ -78,3 +81,5 @@ Has the following Column Options:
 + Activity Status Date Changed
 
 And is searchable by when the Activity Status Last Changed.
+
+NOTE: This is only necessary if they need to track each time an Activity Status is changed if they only care about the last time an activity status is changed we do not need to create a custom report, one could use the Activity Details report and a custom field.
