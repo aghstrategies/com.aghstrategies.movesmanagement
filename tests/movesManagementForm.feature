@@ -19,8 +19,8 @@ Scenario: Adding a basic activity thru the Form
  And its Added by contact will be "Alex Abba"
  And its With Contact will be "Billy Bob"
  And its Assigned to contact wil be "Susan Ryan"
- and its Date will be 5/21/2019
- and its Date Added will be 5/11/2019
+ And its Date will be 5/21/2019
+ And its Date Added will be 5/11/2019
  And its Activity Suggested by will be "Cat Curry"
  And its Activity Status will be "Pending"
  And in the Activity Status Change Table a row will be created with the values Status changed to "Pending", Status updated date 5/11/2019.

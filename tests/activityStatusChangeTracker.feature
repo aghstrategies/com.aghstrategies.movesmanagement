@@ -8,7 +8,7 @@ Scenario: Creating a new Activity
   | Id of the Activity | Status ID                  | Date of change      | Free text |
 
 Scenario: An Activity Status is changed
-  Given a user changes activity id 2's activity status from  "Pending" to "On Hold" on 5/21/2018
+  Given a user changes activity id 2s activity status from  "Pending" to "On Hold" on 5/21/2018
   And enters the reason "Bill sick"
   Then an entry will be added to the Activity Status Change table with the following data
 
