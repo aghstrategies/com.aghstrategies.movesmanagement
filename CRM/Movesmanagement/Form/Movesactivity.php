@@ -9,10 +9,15 @@ use CRM_Movesmanagement_ExtensionUtil as E;
  */
 class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
 
+  // public function validate() {
+  //   // TODO if user selects Activity id other require 'custom_65'
+  // }
+
   public function buildQuickForm() {
 
-    // Use the 'option_value' entity for most "option" lists, e.g. event types, activity types, gender, individual_prefix, custom field options, etc.
-    $this->addEntityRef('act_type', ts('Activity Type'), array(
+    CRM_Core_Resources::singleton()->addScriptFile('com.aghstrategies.movesmanagement', 'js/movesactivity.js');
+
+    $this->addEntityRef('activity_type_id', ts('Activity Type'), array(
       'entity' => 'option_value',
       'placeholder' => ts('- Select Activity Type -'),
       'api' => array(
@@ -23,7 +28,9 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
       ),
     ), TRUE);
 
-    $this->addEntityRef('with_contact', ts('Contact Name'), array(
+    $this->addElement('text', 'custom_65', ts('Other Activity Type'));
+
+    $this->addEntityRef('target_id', ts('Contact Name'), array(
       'api' => array(
         'params' => array('contact_type' => 'Individual'),
       ),
@@ -31,17 +38,18 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
       'multiple' => TRUE,
     ), TRUE);
 
-    $this->add('datepicker', 'added_date', ts('Date Added'));
+    $this->add('datepicker', 'activity_date_time', ts('Date Scheduled'), [], TRUE);
+    $this->add('datepicker', 'created_date', ts('Date Added'), [], TRUE);
 
-    $this->addEntityRef('assigned_to', ts('Assigned to'), array(
+    $this->addEntityRef('assignee_id', ts('Assigned to'), array(
       'api' => array(
         'params' => array('contact_type' => 'Individual'),
       ),
       'create' => TRUE,
       'multiple' => TRUE,
-    ), TRUE);
+    ));
 
-    $this->addEntityRef('suggested_by', ts('Activity Suggested By'), array(
+    $this->addEntityRef('custom_66', ts('Activity Suggested By'), array(
       'api' => array(
         'params' => array('contact_type' => 'Individual'),
       ),
@@ -50,7 +58,7 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
       'multiple' => TRUE,
     ));
 
-    $this->addEntityRef('act_status', ts('Activity Status'), array(
+    $this->addEntityRef('status_id', ts('Activity Status'), array(
       'entity' => 'option_value',
       'api' => array(
         'params' => array('option_group_id' => 'activity_status'),
@@ -60,12 +68,16 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
       'select' => array('minimumInputLength' => 0),
     ), TRUE);
 
-    $this->add('datepicker', 'status_date', ts('Status Change Date'));
-
+    // TODO need to set up customization to track
+    // TODO need to write js to hide reason unless status is canceled to onhold
     $this->addElement('text', 'reason', ts('Reason'));
+
+    // TODO need to set up customization to track this instead of using modified date
+    $this->add('datepicker', 'modified_date', ts('Status Change Date'));
+
     $this->addElement('textarea', 'details', ts('Additional Notes'));
 
-    $this->addEntityRef('ask_made', ts('Ask Made'), array(
+    $this->addEntityRef('custom_67', ts('Ask Made'), array(
       'entity' => 'option_value',
       'placeholder' => ts('- Select Ask Type -'),
       'api' => array(
@@ -76,10 +88,23 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
       ),
     ));
 
-    $this->addMoney('ask_amount', ts('Ask Amount'));
+    $this->addElement('text', 'custom_68', ts('Other Ask Type'));
 
+    $this->addMoney('custom_69', ts('Ask Amount'), FALSE, NULL, FALSE, 'currency', NULL, FALSE);
+
+    // TODO need to figure out how to save files appropriately
     $this->addElement('file', "file_id", ts('Upload Document'), 'size=30 maxlength=255');
     $this->addUploadElement('file_id');
+
+    $defaults = [
+      'created_date' => date('Y-m-d G:i:s'),
+      'modified_date' => date('Y-m-d G:i:s'),
+
+      // TODO need to create a susan ryan contact and hard code this here
+      'assignee_id' => 202,
+    ];
+
+    $this->setDefaults($defaults);
 
     $this->addButtons(array(
       array(
@@ -101,25 +126,61 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
 
   public function postProcess() {
     $values = $this->exportValues();
-    $options = $this->getColorOptions();
-    CRM_Core_Session::setStatus(E::ts('You picked color "%1"', array(
-      1 => $options[$values['favorite_color']],
-    )));
-    parent::postProcess();
-  }
+    $activityParams = [
+      'source_contact_id' => "user_contact_id",
+      'priority_id' => "Normal",
+    ];
 
-  public function getColorOptions() {
-    $options = array(
-      '' => E::ts('- select -'),
-      '#f00' => E::ts('Red'),
-      '#0f0' => E::ts('Green'),
-      '#00f' => E::ts('Blue'),
-      '#f0f' => E::ts('Purple'),
-    );
-    foreach (array('1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e') as $f) {
-      $options["#{$f}{$f}{$f}"] = E::ts('Grey (%1)', array(1 => $f));
+    $activityFields = [
+      'activity_type_id',
+
+      // Other Activity Type
+      'custom_65',
+
+      // Activity Suggested By
+      'custom_66',
+
+      // Ask Made
+      'custom_67',
+
+      // Other Ask Type
+      'custom_68',
+
+      // Ask Amount
+      'custom_69',
+
+      'activity_date_time',
+      'subject',
+      'target_id',
+      'assignee_id',
+      'created_date',
+      'status_id',
+      'details',
+    ];
+
+    foreach ($activityFields as $key => $field) {
+      if (!empty($values[$field])) {
+        $activityParams[$field] = $values[$field];
+      }
     }
-    return $options;
+
+    try {
+      $activity = civicrm_api3('Activity', 'create', $activityParams);
+    }
+    catch (CiviCRM_API3_Exception $e) {
+      $error = $e->getMessage();
+      CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+        'domain' => 'com.aghstrategies.movesmanagement',
+        1 => $error,
+      )));
+    }
+    if ($activity['is_error'] == 0) {
+      CRM_Core_Session::setStatus(E::ts('Activity Created Successfully'), E::ts('Activity Created Successfully'), 'success');
+    }
+    else {
+      CRM_Core_Session::setStatus(E::ts('Looks like something went wrong. This activity has not been saved. see the error log for more details'), E::ts('Activity Not Saved'), 'error');
+    }
+    parent::postProcess();
   }
 
   /**
