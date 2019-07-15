@@ -1,8 +1,8 @@
 {* HEADER *}
 
-<div class="crm-submit-buttons">
+{* <div class="crm-submit-buttons">
 {include file="CRM/common/formButtons.tpl" location="top"}
-</div>
+</div> *}
 
 {* FIELD EXAMPLE: OPTION 1 (AUTOMATIC LAYOUT) *}
 
