@@ -6,11 +6,15 @@
 
 {* FIELD EXAMPLE: OPTION 1 (AUTOMATIC LAYOUT) *}
 
-{foreach from=$elementNames item=elementName}
-  <div class="crm-section">
-    <div class="label">{$form.$elementName.label}</div>
-    <div class="content">{$form.$elementName.html}</div>
-    <div class="clear"></div>
+{foreach from=$elementNames key=actNumber item=act}
+  <div class='act {$actNumber}'>
+    {foreach from=$act item=elementName}
+    <div class="crm-section {$actNumber}">
+      <div class="label">{$form.$elementName.label}</div>
+      <div class="content">{$form.$elementName.html}</div>
+      <div class="clear"></div>
+    </div>
+  {/foreach}
   </div>
 {/foreach}
 

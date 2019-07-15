@@ -9,92 +9,182 @@ use CRM_Movesmanagement_ExtensionUtil as E;
  */
 class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
 
-  // public function validate() {
-  //   // TODO if user selects Activity id other require 'custom_65'
-  // }
-
   public function buildQuickForm() {
 
     CRM_Core_Resources::singleton()->addScriptFile('com.aghstrategies.movesmanagement', 'js/movesactivity.js');
+    $fields = [
+      'activity_type_id' => [
+        'add' => 'addEntityRef',
+        'label' => ts('Activity Type'),
+        'required' => TRUE,
+        'entityRefDetails' => array(
+          'entity' => 'option_value',
+          'placeholder' => ts('- Select Activity Type -'),
+          'api' => array(
+            'params' => array('option_group_id' => 'activity_type'),
+          ),
+          'select' => array(
+            'minimumInputLength' => 0,
+          ),
+        ),
+      ],
+      'custom_65' => [
+        'add' => 'addElement',
+        'type' => 'text',
+        'label' => ts('Other Activity Type'),
+        'required' => FALSE,
+      ],
+      'target_id' => [
+        'add' => 'addEntityRef',
+        'label' => ts('Contact Name'),
+        'required' => TRUE,
+        'entityRefDetails' => array(
+          'api' => array(
+            'params' => array('contact_type' => 'Individual'),
+          ),
+          'create' => TRUE,
+          'multiple' => TRUE,
+        ),
+      ],
+      'activity_date_time' => [
+        'add' => 'add',
+        'type' => 'datepicker',
+        'label' => ts('Date Scheduled'),
+        'required' => TRUE,
+      ],
+      'created_date' => [
+        'add' => 'add',
+        'type' => 'datepicker',
+        'label' => ts('Date Added'),
+        'required' => TRUE,
+      ],
+      'assignee_id' => [
+        'add' => 'addEntityRef',
+        'label' => ts('Assigned to'),
+        'required' => TRUE,
+        'entityRefDetails' => array(
+          'api' => array(
+            'params' => array('contact_type' => 'Individual'),
+          ),
+          'create' => TRUE,
+          'multiple' => TRUE,
+        ),
+      ],
+      'custom_66' => [
+        'add' => 'addEntityRef',
+        'label' => ts('Activity Suggested By'),
+        'required' => FALSE,
+        'entityRefDetails' => array(
+          'api' => array(
+            'params' => array('contact_type' => 'Individual'),
+          ),
+          'placeholder' => ts('- Select Contact -'),
+          'create' => TRUE,
+          'multiple' => TRUE,
+        ),
+      ],
+      'status_id' => [
+        'add' => 'addEntityRef',
+        'label' => ts('Activity Status'),
+        'required' => TRUE,
+        'entityRefDetails' => array(
+          'entity' => 'option_value',
+          'api' => array(
+            'params' => array('option_group_id' => 'activity_status'),
+          ),
+          'placeholder' => ts('- Select Activity Status -'),
 
-    $this->addEntityRef('activity_type_id', ts('Activity Type'), array(
-      'entity' => 'option_value',
-      'placeholder' => ts('- Select Activity Type -'),
-      'api' => array(
-        'params' => array('option_group_id' => 'activity_type'),
-      ),
-      'select' => array(
-        'minimumInputLength' => 0,
-      ),
-    ), TRUE);
+          'select' => array('minimumInputLength' => 0),
+        ),
+      ],
 
-    $this->addElement('text', 'custom_65', ts('Other Activity Type'));
+      // TODO need to set up customization to track this
+      'reason' => [
+        'add' => 'addElement',
+        'type' => 'text',
+        'label' => ts('Reason'),
+        'required' => FALSE,
+      ],
 
-    $this->addEntityRef('target_id', ts('Contact Name'), array(
-      'api' => array(
-        'params' => array('contact_type' => 'Individual'),
-      ),
-      'create' => TRUE,
-      'multiple' => TRUE,
-    ), TRUE);
+      // TODO need to set up customization to track this
+      'modified_date' => [
+        'add' => 'add',
+        'type' => 'datepicker',
+        'label' => ts('Status Change Date'),
+        'required' => FALSE,
+      ],
 
-    $this->add('datepicker', 'activity_date_time', ts('Date Scheduled'), [], TRUE);
-    $this->add('datepicker', 'created_date', ts('Date Added'), [], TRUE);
+      'details' => [
+        'add' => 'addElement',
+        'type' => 'textarea',
+        'label' => ts('Additional Notes'),
+        'required' => FALSE,
+      ],
 
-    $this->addEntityRef('assignee_id', ts('Assigned to'), array(
-      'api' => array(
-        'params' => array('contact_type' => 'Individual'),
-      ),
-      'create' => TRUE,
-      'multiple' => TRUE,
-    ));
-
-    $this->addEntityRef('custom_66', ts('Activity Suggested By'), array(
-      'api' => array(
-        'params' => array('contact_type' => 'Individual'),
-      ),
-      'placeholder' => ts('- Select Contact -'),
-      'create' => TRUE,
-      'multiple' => TRUE,
-    ));
-
-    $this->addEntityRef('status_id', ts('Activity Status'), array(
-      'entity' => 'option_value',
-      'api' => array(
-        'params' => array('option_group_id' => 'activity_status'),
-      ),
-      'placeholder' => ts('- Select Activity Status -'),
-
-      'select' => array('minimumInputLength' => 0),
-    ), TRUE);
-
-    // TODO need to set up customization to track
-    // TODO need to write js to hide reason unless status is canceled to onhold
-    $this->addElement('text', 'reason', ts('Reason'));
-
-    // TODO need to set up customization to track this instead of using modified date
-    $this->add('datepicker', 'modified_date', ts('Status Change Date'));
-
-    $this->addElement('textarea', 'details', ts('Additional Notes'));
-
-    $this->addEntityRef('custom_67', ts('Ask Made'), array(
-      'entity' => 'option_value',
-      'placeholder' => ts('- Select Ask Type -'),
-      'api' => array(
-        'params' => array('option_group_id' => 'activity_type'),
-      ),
-      'select' => array(
-        'minimumInputLength' => 0,
-      ),
-    ));
-
-    $this->addElement('text', 'custom_68', ts('Other Ask Type'));
-
-    $this->addMoney('custom_69', ts('Ask Amount'), FALSE, NULL, FALSE, 'currency', NULL, FALSE);
+      'custom_67' => [
+        'add' => 'addEntityRef',
+        'label' => ts('Ask Made'),
+        'required' => FALSE,
+        'entityRefDetails' => array(
+          'entity' => 'option_value',
+          'placeholder' => ts('- Select Ask Type -'),
+          'api' => array(
+            'params' => array('option_group_id' => 'activity_type'),
+          ),
+          'select' => array(
+            'minimumInputLength' => 0,
+          ),
+        ),
+      ],
+      'custom_68' => [
+        'add' => 'addElement',
+        'type' => 'text',
+        'label' => ts('Other Ask Type'),
+        'required' => FALSE,
+      ],
+      'custom_69' => [
+        'add' => 'addMoney',
+        'label' => ts('Ask Amount'),
+      ],
+    ];
 
     // TODO need to figure out how to save files appropriately
-    $this->addElement('file', "file_id", ts('Upload Document'), 'size=30 maxlength=255');
-    $this->addUploadElement('file_id');
+    // $this->addElement('file', "file_id", ts('Upload Document'), 'size=30 maxlength=255');
+    // $this->addUploadElement('file_id');
+
+    $numberOfActivities = 0;
+    while ($numberOfActivities <= 4) {
+      foreach ($fields as $fieldName => $fieldDetails) {
+        $name = $fieldName . "-$numberOfActivities";
+        switch ($fieldDetails['add']) {
+          case 'addEntityRef':
+            if ($numberOfActivities > 0 && $fieldName == 'activity_type_id') {
+              $this->addEntityRef($name, "Follow Up Activity {$numberOfActivities}", $fieldDetails['entityRefDetails'], FALSE);
+            }
+            else {
+              $this->addEntityRef($name, $fieldDetails['label'], $fieldDetails['entityRefDetails'], FALSE);
+            }
+            break;
+
+          case 'addElement':
+            $this->addElement($fieldDetails['type'], $name, $fieldDetails['label'], FALSE);
+            break;
+
+          case 'add':
+            $this->add($fieldDetails['type'], $name, $fieldDetails['label'], [], FALSE);
+            break;
+
+          case 'addMoney':
+            $this->addMoney($name, $fieldDetails['label'], FALSE, NULL, FALSE, 'currency', NULL, FALSE);
+            break;
+
+          default:
+            // code...
+            break;
+        }
+      }
+      $numberOfActivities++;
+    }
 
     $defaults = [
       'created_date' => date('Y-m-d G:i:s'),
@@ -113,8 +203,8 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
         'isDefault' => TRUE,
       ),
       array(
-        'type' => 'follow',
-        'name' => E::ts('Add Follow Up Activity'),
+        'type' => 'refresh',
+        'name' => E::ts('Add a Follow Up Activity'),
         'isDefault' => TRUE,
       ),
     ));
@@ -125,6 +215,7 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
   }
 
   public function postProcess() {
+    // TODO rework post process to process all activities
     $values = $this->exportValues();
     $activityParams = [
       'source_contact_id' => "user_contact_id",
@@ -198,10 +289,16 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
       /** @var HTML_QuickForm_Element $element */
       $label = $element->getLabel();
       if (!empty($label)) {
-        $elementNames[] = $element->getName();
+        $elementNames[substr($element->getName(), -1)][] = $element->getName();
       }
     }
+    // print_r($elementNames); die();
     return $elementNames;
   }
+
+  // TODO handle all validation in here
+  // public function validate() {
+  //   // TODO if user selects Activity id other require 'custom_65'
+  // }
 
 }
