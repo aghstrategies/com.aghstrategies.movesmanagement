@@ -1,9 +1,8 @@
 CRM.$(function ($) {
+  // hide / show follow up activity fields if activity type is selected
   var followUpActivities = function() {
-    // formatting
     $.each($('input[id^="activity_type_id"]'), function(i, element) {
       var lastChar = $(element).attr('id').substr(-1);
-      console.log(lastChar);
       if (lastChar != '0') {
         if ($(element).val().length) {
           $('.crm-section.' + lastChar).show();

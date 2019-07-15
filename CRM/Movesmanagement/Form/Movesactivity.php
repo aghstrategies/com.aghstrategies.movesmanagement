@@ -202,11 +202,6 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
         'name' => E::ts('Submit'),
         'isDefault' => TRUE,
       ),
-      array(
-        'type' => 'refresh',
-        'name' => E::ts('Add a Follow Up Activity'),
-        'isDefault' => TRUE,
-      ),
     ));
 
     // export form elements
