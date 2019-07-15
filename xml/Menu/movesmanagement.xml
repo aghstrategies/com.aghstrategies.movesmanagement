@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<menu>
+  <item>
+    <path>civicrm/movesactivity</path>
+    <page_callback>CRM_Movesmanagement_Form_Movesactivity</page_callback>
+    <title>Moves Management Activity Creation Form</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+</menu>
