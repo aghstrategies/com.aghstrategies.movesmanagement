@@ -4,9 +4,69 @@ require_once 'movesmanagement.civix.php';
 use CRM_Movesmanagement_ExtensionUtil as E;
 
 /**
+ * Implements hook_civicrm_buildForm().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_buildForm/
+ */
+function movesmanagement_civicrm_buildForm($formName, &$form) {
+  if ($formName == 'CRM_Activity_Form_Activity') {
+    $form->add('text', 'reason', ts('Reason for Status Change'));
+    $form->add('datepicker', 'date_change', ts('Date Status Changed'));
+    CRM_Core_Resources::singleton()->addScriptFile('com.aghstrategies.movesmanagement', 'js/statusChange.js');
+    $templatePath = realpath(dirname(__FILE__) . "/templates");
+    CRM_Core_Region::instance('form-body')->add(array(
+      'template' => "{$templatePath}/actChange.tpl",
+    ));
+    $defaults['date_change'] = date('Y-m-d G:i:s');
+    $form->setDefaults($defaults);
+  }
+}
+
+/**
+ * Implements hook_civicrm_post().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_post/
+ */
+// function movesmanagement_civicrm_post($op, $objectName, $objectId, &$objectRef) {
+//   if ($objectName == 'Activity' && $op == 'edit') {
+//     $sql = "INSERT INTO civicrm_activity_status_change (activity_id, status_to_id) VALUES ({$objectRef->id}, {$objectRef->status_id});";
+//     $dao = CRM_Core_DAO::executeQuery($sql);
+//   }
+// }
+
+/**
+ * Implements hook_civicrm_postProcess().
+ *
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_postProcess/
+ */
+function movesmanagement_civicrm_postProcess($formName, &$form) {
+  if ($formName == 'CRM_Activity_Form_Activity') {
+    $reason = "na";
+    if (!empty($form->_submitValues['reason'])) {
+      $reason = $form->_submitValues['reason'];
+    }
+    // Check if status has changed
+
+    $sql = "INSERT INTO civicrm_activity_status_change (activity_id, status_to_id, reason) VALUES ({$form->_activityId}, {$form->_submitValues['status_id']}, '" . $reason . "', );";
+    $dao = CRM_Core_DAO::executeQuery($sql);
+  }
+}
+
+function movesmanagement_checkForExisting($activityId, $status_to_id, $reason, $status_changed) {
+  $sql = "SELECT id FROM civicrm_activity_status_change WHERE activity_id = {$activityId} AND status_to_id = {$status_to_id} AND date_changed = {$status_changed}";
+  $dao = CRM_Core_DAO::executeQuery($sql);
+  if ($dao->fetch()) {
+    $dao->id;
+  }
+
+  $sql = "SELECT * civicrm_activity_status_change WHERE ;";
+  $dao = CRM_Core_DAO::executeQuery($sql);
+}
+
+/**
  * Implements hook_civicrm_config().
  *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/ 
+ * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_config/
  */
 function movesmanagement_civicrm_config(&$config) {
   _movesmanagement_civix_civicrm_config($config);
@@ -27,6 +87,18 @@ function movesmanagement_civicrm_xmlMenu(&$files) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_install
  */
 function movesmanagement_civicrm_install() {
+  /* Create Activity Status Change Table */
+  CRM_Core_DAO::executeQuery('CREATE TABLE IF NOT EXISTS civicrm_activity_status_change (
+    id int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT "Change Id",
+    activity_id int(10) unsigned NULL COMMENT "Activity Changed",
+    status_to_id int(10) unsigned NULL COMMENT "Status changed to ID",
+    status_from_id int(10) unsigned NULL COMMENT "Status changed from ID",
+    reason varchar(64) COLLATE utf8_unicode_ci NULL COMMENT "Reason Changed",
+    date_changed timestamp,
+    PRIMARY KEY (`id`),
+    FOREIGN KEY (`activity_id`) REFERENCES civicrm_activity(`id`) ON DELETE CASCADE,
+    UNIQUE KEY (`id`)
+  ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1 ;');
   _movesmanagement_civix_civicrm_install();
 }
 
