@@ -144,6 +144,12 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
         'add' => 'addMoney',
         'label' => ts('Ask Amount'),
       ],
+      // TODO need to figure out how to save files appropriately
+      'file_id' => [
+        'add' => 'addElement',
+        'type' => 'file',
+        'label' => ts('Upload Document'),
+      ],
     ];
   }
 
@@ -152,12 +158,8 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
     CRM_Core_Resources::singleton()->addScriptFile('com.aghstrategies.movesmanagement', 'js/movesactivity.js');
 
     $fields = self::activityFields();
-
-    // TODO need to figure out how to save files appropriately
-    // $this->addElement('file', "file_id", ts('Upload Document'), 'size=30 maxlength=255');
-    // $this->addUploadElement('file_id');
-
     $numberOfActivities = 0;
+    $defaults = [];
     while ($numberOfActivities <= 4) {
       foreach ($fields as $fieldName => $fieldDetails) {
         $name = $fieldName . "-$numberOfActivities";
@@ -188,16 +190,15 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
             break;
         }
       }
-      $numberOfActivities++;
-    }
-
-    $defaults = [
-      'created_date' => date('Y-m-d G:i:s'),
-      'modified_date' => date('Y-m-d G:i:s'),
+      // Set defaults
+      $defaults["created_date" . "-$numberOfActivities"] = date('Y-m-d G:i:s');
+      $defaults["modified_date" . "-$numberOfActivities"] = date('Y-m-d G:i:s');
 
       // TODO need to create a susan ryan contact and hard code this here
-      'assignee_id' => 202,
-    ];
+      $defaults["assignee_id" . "-$numberOfActivities"] = 202;
+
+      $numberOfActivities++;
+    }
 
     $this->setDefaults($defaults);
 
@@ -215,7 +216,6 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
   }
 
   public function postProcess() {
-    // TODO rework post process to process all activities
     $values = $this->exportValues();
     $fields = self::activityFields();
 
