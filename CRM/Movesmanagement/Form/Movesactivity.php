@@ -9,10 +9,8 @@ use CRM_Movesmanagement_ExtensionUtil as E;
  */
 class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
 
-  public function buildQuickForm() {
-
-    CRM_Core_Resources::singleton()->addScriptFile('com.aghstrategies.movesmanagement', 'js/movesactivity.js');
-    $fields = [
+  public function activityFields() {
+    return [
       'activity_type_id' => [
         'add' => 'addEntityRef',
         'label' => ts('Activity Type'),
@@ -147,6 +145,13 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
         'label' => ts('Ask Amount'),
       ],
     ];
+  }
+
+  public function buildQuickForm() {
+
+    CRM_Core_Resources::singleton()->addScriptFile('com.aghstrategies.movesmanagement', 'js/movesactivity.js');
+
+    $fields = self::activityFields();
 
     // TODO need to figure out how to save files appropriately
     // $this->addElement('file', "file_id", ts('Upload Document'), 'size=30 maxlength=255');
@@ -212,60 +217,39 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
   public function postProcess() {
     // TODO rework post process to process all activities
     $values = $this->exportValues();
-    $activityParams = [
-      'source_contact_id' => "user_contact_id",
-      'priority_id' => "Normal",
-    ];
+    $fields = self::activityFields();
 
-    $activityFields = [
-      'activity_type_id',
-
-      // Other Activity Type
-      'custom_65',
-
-      // Activity Suggested By
-      'custom_66',
-
-      // Ask Made
-      'custom_67',
-
-      // Other Ask Type
-      'custom_68',
-
-      // Ask Amount
-      'custom_69',
-
-      'activity_date_time',
-      'subject',
-      'target_id',
-      'assignee_id',
-      'created_date',
-      'status_id',
-      'details',
-    ];
-
-    foreach ($activityFields as $key => $field) {
-      if (!empty($values[$field])) {
-        $activityParams[$field] = $values[$field];
+    $numberOfActivities = 0;
+    while ($numberOfActivities <= 4) {
+      foreach ($fields as $field => $fieldDetails) {
+        $name = $field . "-$numberOfActivities";
+        if (!empty($values[$name])) {
+          $activityParams[$numberOfActivities][$field] = $values[$name];
+        }
       }
+      if (!empty($values["activity_type_id-{$numberOfActivities}"])) {
+        $activityParams[$numberOfActivities]['source_contact_id'] = "user_contact_id";
+        $activityParams[$numberOfActivities]['priority_id'] = "Normal";
+        try {
+          $activity = civicrm_api3('Activity', 'create', $activityParams[$numberOfActivities]);
+        }
+        catch (CiviCRM_API3_Exception $e) {
+          $error = $e->getMessage();
+          CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+            'domain' => 'com.aghstrategies.movesmanagement',
+            1 => $error,
+          )));
+        }
+        if ($activity['is_error'] == 0) {
+          CRM_Core_Session::setStatus(E::ts('Activities Created Successfully'), E::ts('Activities Created Successfully'), 'success');
+        }
+        else {
+          CRM_Core_Session::setStatus(E::ts('Looks like something went wrong. This activity has not been saved. see the error log for more details'), E::ts('Activity Not Saved'), 'error');
+        }
+      }
+      $numberOfActivities++;
     }
 
-    try {
-      $activity = civicrm_api3('Activity', 'create', $activityParams);
-    }
-    catch (CiviCRM_API3_Exception $e) {
-      $error = $e->getMessage();
-      CRM_Core_Error::debug_log_message(ts('API Error %1', array(
-        'domain' => 'com.aghstrategies.movesmanagement',
-        1 => $error,
-      )));
-    }
-    if ($activity['is_error'] == 0) {
-      CRM_Core_Session::setStatus(E::ts('Activity Created Successfully'), E::ts('Activity Created Successfully'), 'success');
-    }
-    else {
-      CRM_Core_Session::setStatus(E::ts('Looks like something went wrong. This activity has not been saved. see the error log for more details'), E::ts('Activity Not Saved'), 'error');
-    }
     parent::postProcess();
   }
 
