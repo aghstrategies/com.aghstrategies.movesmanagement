@@ -7,7 +7,7 @@
 {* FIELD EXAMPLE: OPTION 1 (AUTOMATIC LAYOUT) *}
 
 {foreach from=$elementNames key=actNumber item=act}
-  <div class='act {$actNumber}'>
+  <div class='act a{$actNumber}'>
     {foreach from=$act item=elementName}
     <div class="crm-section {$actNumber}">
       <div class="label">{$form.$elementName.label}</div>

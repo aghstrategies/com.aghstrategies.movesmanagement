@@ -18,7 +18,15 @@ CRM.$(function ($) {
         $('.crm-section.' + lastChar).hide();
       }
     });
-    $('.crm-section input[id^="activity_type_id"]').parent().parent().show();
+    $('.crm-section input[id^="activity_type_id-0"]').parent().parent().show();
+    $('.crm-section input[id^="activity_type_id-1"]').parent().parent().show();
+    if ($('input#activity_type_id-1').val().length) {
+      $('.crm-section input[id^="activity_type_id-2"]').parent().parent().show();
+    }
+    if ($('input#activity_type_id-2').val().length) {
+      $('.crm-section input[id^="activity_type_id-3"]').parent().parent().show();
+    }
+
   };
 
   // If Ask Made is "Other" show "Other Ask Type" field otherwise hide

@@ -154,13 +154,13 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
-
-    CRM_Core_Resources::singleton()->addScriptFile('com.aghstrategies.movesmanagement', 'js/movesactivity.js');
-
+    $resources = CRM_Core_Resources::singleton();
+    $resources->addScriptFile('com.aghstrategies.movesmanagement', 'js/movesactivity.js');
+    $resources->addStyleFile('com.aghstrategies.movesmanagement', 'css/movesactivity.css');
     $fields = self::activityFields();
     $numberOfActivities = 0;
     $defaults = [];
-    while ($numberOfActivities <= 4) {
+    while ($numberOfActivities <= 3) {
       foreach ($fields as $fieldName => $fieldDetails) {
         $name = $fieldName . "-$numberOfActivities";
         switch ($fieldDetails['add']) {
@@ -220,7 +220,7 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
     $fields = self::activityFields();
 
     $numberOfActivities = 0;
-    while ($numberOfActivities <= 4) {
+    while ($numberOfActivities <= 3) {
       foreach ($fields as $field => $fieldDetails) {
         $name = $field . "-$numberOfActivities";
         if (!empty($values[$name])) {

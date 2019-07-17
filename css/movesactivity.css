@@ -1,0 +1,6 @@
+.act.a1 .crm-section:first-child,
+.act.a2 .crm-section:first-child,
+.act.a3 .crm-section:first-child {
+  padding-top: 10px;
+  border-top: 1px solid #ccc;
+}
