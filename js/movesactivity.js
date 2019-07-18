@@ -69,10 +69,22 @@ CRM.$(function ($) {
     });
   };
 
+  // If Contact Name field for first activity changes update all other activities if contact name fields if they are empty
+  var selectContact = function () {
+    if ($('input#target_id-0').val().length) {
+      $.each($('[id^="target_id-"]'), function(i, element) {
+        if (!$(element).val().length) {
+          $(element).val($('#target_id-0').val()).trigger('change');
+        }
+      });
+    }
+  };
+
   followUpActivities();
   $('input[id^="activity_type_id"]').change(followUpActivities);
   $('input[id^="activity_type_id"]').change(showOtherAskTypeField);
   $('input[id^="custom_67"]').change(showOtherAskTypeField);
   $('input[id^="activity_type_id"]').change(showReasonField);
   $('input[id^="status_id"]').change(showReasonField);
+  $('input#target_id-0').change(selectContact);
 });
