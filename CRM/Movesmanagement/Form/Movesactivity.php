@@ -218,7 +218,6 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
   public function postProcess() {
     $values = $this->exportValues();
     $fields = self::activityFields();
-
     $numberOfActivities = 0;
     while ($numberOfActivities <= 3) {
       foreach ($fields as $field => $fieldDetails) {
@@ -245,6 +244,41 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
         }
         else {
           CRM_Core_Session::setStatus(E::ts('Looks like something went wrong. This activity has not been saved. see the error log for more details'), E::ts('Activity Not Saved'), 'error');
+        }
+        // process attachments
+        if (!empty($this->_submitFiles)) {
+          if (!empty($this->_submitFiles['file_id-' . $numberOfActivities]['size']) &&
+          $this->_submitFiles['file_id-' . $numberOfActivities]['size'] > 0 &&
+          !empty($this->_submitFiles['file_id-' . $numberOfActivities]['name']) &&
+          !empty($this->_submitFiles['file_id-' . $numberOfActivities]['type']) &&
+          !empty($activity['id'])) {
+            try {
+              $file = civicrm_api3('Attachment', 'create', array(
+                'entity_table' => 'civicrm_activity',
+                'entity_id' => $activity['id'],
+                'name' => $this->_submitFiles['file_id-' . $numberOfActivities]['name'],
+                'mime_type' => $this->_submitFiles['file_id-' . $numberOfActivities]['type'],
+                'content' => 'Activity Attachment',
+              ));
+            }
+            catch (CiviCRM_API3_Exception $e) {
+              $error = $e->getMessage();
+              CRM_Core_Error::debug_log_message(ts('API Error %1', array(
+                'domain' => 'com.aghstrategies.movesmanagement',
+                1 => $error,
+              )));
+            }
+            if ($file['is_error'] == 0) {
+              CRM_Core_Session::setStatus(E::ts('Activity Attachment Created Successfully'), E::ts('Activity Attachment'), 'success');
+            }
+            else {
+              CRM_Core_Session::setStatus(
+                E::ts('Looks like something went wrong. This activity attachment has not been saved. see the error log for more details'),
+                E::ts('Activity Attachment Not Saved'),
+                'error'
+              );
+            }
+          }
         }
       }
       $numberOfActivities++;
