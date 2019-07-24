@@ -97,20 +97,20 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
       ],
 
       // TODO need to set up customization to track this
-      'reason' => [
-        'add' => 'addElement',
-        'type' => 'text',
-        'label' => ts('Reason'),
-        'required' => FALSE,
-      ],
+      // 'reason' => [
+      //   'add' => 'addElement',
+      //   'type' => 'text',
+      //   'label' => ts('Reason'),
+      //   'required' => FALSE,
+      // ],
 
       // TODO need to set up customization to track this
-      'modified_date' => [
-        'add' => 'add',
-        'type' => 'datepicker',
-        'label' => ts('Status Change Date'),
-        'required' => FALSE,
-      ],
+      // 'modified_date' => [
+      //   'add' => 'add',
+      //   'type' => 'datepicker',
+      //   'label' => ts('Status Change Date'),
+      //   'required' => FALSE,
+      // ],
 
       'details' => [
         'add' => 'addElement',
@@ -194,8 +194,8 @@ class CRM_Movesmanagement_Form_Movesactivity extends CRM_Core_Form {
       $defaults["created_date" . "-$numberOfActivities"] = date('Y-m-d G:i:s');
       $defaults["modified_date" . "-$numberOfActivities"] = date('Y-m-d G:i:s');
 
-      // TODO need to create a susan ryan contact and hard code this here
-      $defaults["assignee_id" . "-$numberOfActivities"] = 202;
+      // TODO need Ryan Quick contact created and to add the ID here
+      $defaults["assignee_id" . "-$numberOfActivities"] = [2885];
 
       $numberOfActivities++;
     }
